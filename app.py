@@ -8,7 +8,9 @@ st.set_page_config(
 )
 
 st.title("💻 Mini SQL Playground")
-st.caption("Media latihan database mandiri untuk Kelas XI RPL via HP.")
+st.caption(
+    "Media latihan database mandiri untuk Kelas XI RPL - Versi Super Lengkap!"
+)
 
 
 # Inisialisasi Database SQLite
@@ -20,19 +22,22 @@ def init_db():
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             nama TEXT,
             kelas TEXT,
-            nilai INTEGER
+            nilai INTEGER,
+            jurusan TEXT
         )
     """)
   # Masukin data awal kalau kosong
   c.execute("SELECT COUNT(*) FROM siswa")
   if c.fetchone()[0] == 0:
     c.executemany(
-        "INSERT INTO siswa (nama, kelas, nilai) VALUES (?, ?, ?)",
+        "INSERT INTO siswa (nama, kelas, nilai, jurusan) VALUES (?, ?, ?, ?)",
         [
-            ("AKBAR HABIBI", "XI RPL 1", 85),
-            ("M ALFATH JABAR", "XI RPL 1", 90),
-            ("ALDY", "XI RPL 2", 78),
-            ("HUMAIRA UMBU", "XI RPL 2", 92),
+            ("AKBAR HABIBI", "XI RPL 1", 85, "RPL"),
+            ("M ALFATH JABAR", "XI RPL 1", 90, "RPL"),
+            ("ALDY", "XI RPL 2", 78, "TKJ"),
+            ("HUMAIRA UMBU", "XI RPL 2", 92, "RPL"),
+            ("SITI AMINAH", "XI RPL 1", 88, "RPL"),
+            ("JOKO ANWAR", "XI RPL 2", 65, "TKJ"),
         ],
     )
   conn.commit()
@@ -44,15 +49,22 @@ init_db()
 # Hubungkan ke database
 conn = sqlite3.connect("sekolah.db")
 
-# Cheat sheet materi buat contekan mereka
-with st.expander("💡 Contoh Query untuk Latihan"):
+# Cheat sheet materi query super lengkap
+with st.expander("💡 Panduan & Cheat Sheet Query SQL Lengkap"):
+  st.markdown("Anak-anak bisa coba beberapa variasi perintah di bawah ini:")
   st.code("SELECT * FROM siswa;", language="sql")
   st.code("SELECT nama, nilai FROM siswa WHERE nilai > 80;", language="sql")
+  st.code("SELECT * FROM siswa ORDER BY nilai DESC;", language="sql")
+  st.code("SELECT * FROM siswa WHERE nama LIKE '%A%';", language="sql")
   st.code(
-      "INSERT INTO siswa (nama, kelas, nilai) VALUES ('Rian', 'XI RPL 1',"
-      " 88);",
+      "INSERT INTO siswa (nama, kelas, nilai, jurusan) VALUES ('RIAN', 'XI RPL"
+      " 1', 88, 'RPL');",
       language="sql",
   )
+  st.code(
+      "UPDATE siswa SET nilai = 95 WHERE nama = 'ALDY';", language="sql"
+  )
+  st.code("DELETE FROM siswa WHERE nilai < 70;", language="sql")
 
 # Kotak input query SQL
 query = st.text_area(
@@ -66,17 +78,20 @@ if st.button("Jalankan Query 🚀", type="primary"):
     if query.strip().lower().startswith("select"):
       # Kalau SELECT, tampilkan hasilnya dalam bentuk tabel
       df = pd.read_sql_query(query, conn)
-      st.success("Query berhasil dieksekusi!")
+      st.success(
+          f"Query berhasil dieksekusi! Menampilkan {len(df)} baris data."
+      )
       st.dataframe(df, use_container_width=True)
     else:
       # Kalau INSERT/UPDATE/DELETE
       c = conn.cursor()
       c.execute(query)
       conn.commit()
-      st.success("Perintah berhasil dijalankan! Data diperbarui.")
+      st.success("Perintah berhasil dijalankan! Database telah diperbarui.")
 
       # Tampilkan tabel terbaru setelah diubah
       df_updated = pd.read_sql_query("SELECT * FROM siswa", conn)
+      st.markdown("### Data Tabel Siswa Terbaru:")
       st.dataframe(df_updated, use_container_width=True)
   except Exception as e:
     st.error(f"Error SQL: {e}")
