@@ -29,10 +29,10 @@ def init_db():
     c.executemany(
         "INSERT INTO siswa (nama, kelas, nilai) VALUES (?, ?, ?)",
         [
-            ("Budi Santoso", "XI RPL 1", 85),
-            ("Siti Aminah", "XI RPL 1", 90),
-            ("Joko Anwar", "XI RPL 2", 78),
-            ("Dewi Lestari", "XI RPL 2", 92),
+            ("AKBAR HABIBI", "XI RPL 1", 85),
+            ("M ALFATH JABAR", "XI RPL 1", 90),
+            ("ALDY", "XI RPL 2", 78),
+            ("HUMAIRA UMBU", "XI RPL 2", 92),
         ],
     )
   conn.commit()
